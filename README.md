@@ -1,3 +1,4 @@
-# feature_matching
+# softwere3
 
-openCVを用いた特徴点マッチングについて
+feature_matching.cpp
+-openCVを用いた特徴点マッチングを行う
