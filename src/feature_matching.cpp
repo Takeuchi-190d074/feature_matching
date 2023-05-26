@@ -49,7 +49,6 @@ void feature_matching(const cv::Mat &src1, const cv::Mat &src2, cv::Mat &dst)
   sim /= match.size();
   std::cout << "類似度: " << sim << std::endl; 
 
-
   /* 画像の類似度が低すぎる場合は終了 */
   if(0/* sim > THRESHOLD*/){
     std::cerr << "画像が違いすぎます" << std::endl;
