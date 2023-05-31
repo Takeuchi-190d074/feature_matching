@@ -65,6 +65,7 @@ void feature_matching(const cv::Mat &src1, const cv::Mat &src2, cv::Mat &dst1, c
     if(knn_matches[i][0].distance < RATIO_THRESH * knn_matches[i][1].distance){
       match.push_back(knn_matches[i][0]);
     }
+    std::swap(match[i], match[n]);
   }
 
   /* 類似度計算(距離による実装、0に近い値ほど画像が類似) */
