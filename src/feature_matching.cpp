@@ -16,22 +16,23 @@ void feature_matching(const cv::Mat &src1, const cv::Mat &src2, cv::Mat &dst)
   // akaze->detect(src1, key1);
   // akaze->detect(src2, key2);
   // akaze->compute(src1, key1, des1); 
-	// akaze->compute(src2, key2, des2);
+  // akaze->compute(src2, key2, des2);
   /* ORB */
-	cv::Ptr<cv::ORB> orb = cv::ORB::create(100);
-	orb->detect(src1, key1);
-	orb->detect(src2, key2);
+  cv::Ptr<cv::ORB> orb = cv::ORB::create(100);
+  orb->detect(src1, key1);
+  orb->detect(src2, key2);
   orb->compute(src1, key1, des1); 
-	orb->compute(src2, key2, des2);
+  orb->compute(src2, key2, des2);
   // std::cout << des1 << std::endl;
 
   /* 特徴点マッチングアルゴリズム */
+  /* 総当たり */
   cv::Ptr<cv::DescriptorMatcher> matcher = cv::DescriptorMatcher::create("BruteForce");
 
   /* 特徴点マッチング */
   /* クロスチェックを行い、両方でマッチしたものだけ残す */
   std::vector<cv::DMatch> match, match12, match21;
-	matcher->match(des1, des2, match12);
+  matcher->match(des1, des2, match12);
   matcher->match(des2, des1, match21);
   for(int i = 0; i < match12.size(); i++){
     cv::DMatch forward = match12[i];
