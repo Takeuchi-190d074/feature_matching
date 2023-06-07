@@ -7,11 +7,13 @@
     dst  : 出力画像(src1をsrc2に合わせて変形した画像)
     
     動作確認済
-    1. 特徴点検出:ORB   + 特徴点マッチング:総当たり
-    2. 特徴点検出:AKAZE + 特徴点マッチング:総当たり
+    1. 特徴点検出:ORB   + 特徴点マッチング:総当たり(BMF)
+    2. 特徴点検出:AKAZE + 特徴点マッチング:総当たり(BMF)
+    3. 特徴点検出:ORB   + 特徴点マッチング:FLANN + ratio test
+    4. 特徴点検出:AKAZE + 特徴点マッチング:FLANN + ratio test
     
-    必要処理時間: 1 < 2 
-    精度        : 1 < 2    */
+    必要処理時間: 3 < 1 < 4 < 2 
+    精度　　　　: 1 = 3 < 2 = 4    */
 
 void feature_matching(const cv::Mat &src1, const cv::Mat &src2, cv::Mat &dst)
 {
@@ -38,12 +40,28 @@ void feature_matching(const cv::Mat &src1, const cv::Mat &src2, cv::Mat &dst)
   //std::cout << des1 << std::endl;
 
   /* 特徴点マッチングアルゴリズム */
+  cv::Ptr<cv::DescriptorMatcher> matcher;
+  std::vector<cv::DMatch> match;
   /* 総当たり */
-  cv::Ptr<cv::DescriptorMatcher> matcher = cv::DescriptorMatcher::create("BruteForce");
-
-  /* 特徴点マッチング */
-  std::vector<cv::DMatch> match, match12, match21;
-  matcher->match(des1, des2, match);
+  // matcher = cv::DescriptorMatcher::create("BruteForce");
+  // matcher->match(des1, des2, match);
+  /* FLANN */
+  matcher = cv::DescriptorMatcher::create("FlannBased");
+  std::vector<std::vector<cv::DMatch>> knn_matches;
+  if(des1.type() != CV_32F) {
+    des1.convertTo(des1, CV_32F);
+  }
+  if(des2.type() != CV_32F) {
+    des2.convertTo(des2, CV_32F);
+  }
+  matcher->knnMatch(des1, des2, knn_matches, 2);
+  /* ratio test */
+  const float RATIO_THRESH = 0.7f;
+  for(int i = 0; i < knn_matches.size(); i++){
+    if(knn_matches[i][0].distance < RATIO_THRESH * knn_matches[i][1].distance){
+      match.push_back(knn_matches[i][0]);
+    }
+  }
 
   /* 特徴量距離の小さい順にソートし、不要な点を削除 */
   for(int i = 0; i < match.size(); i++){
@@ -57,7 +75,11 @@ void feature_matching(const cv::Mat &src1, const cv::Mat &src2, cv::Mat &dst)
     }
     std::swap(match[i], match[n]);
   }
-  match.erase(match.begin() + 50, match.end());
+  if(match.size() > 50){
+    match.erase(match.begin() + 50, match.end());
+  }else{
+    match.erase(match.begin() + match.size(), match.end());
+  }
 
   /* 類似度計算(距離による実装、0に近い値ほど画像が類似) */
   for(int i = 0; i < match.size(); i++){
@@ -73,7 +95,7 @@ void feature_matching(const cv::Mat &src1, const cv::Mat &src2, cv::Mat &dst)
     std::exit(1);
   }
 
-  // cv::drawMatches(src1, key1, src2, key2, match, dst);
+  //cv::drawMatches(src1, key1, src2, key2, match, dst);
 
   /* src1をsrc2に合わせる形で射影変換して補正 */
   std::vector<cv::Vec2f> get_pt1(match.size()), get_pt2(match.size()); // 使用する特徴点

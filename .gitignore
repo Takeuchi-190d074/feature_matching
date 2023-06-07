@@ -3,6 +3,8 @@ build/*
 
 # テスト用のmain関数
 /src/main.cpp
+/src/sof.cpp
+/src/absdiff.cpp
 
 #テスト用のcmake
 /CMakeLists.txt
