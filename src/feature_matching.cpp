@@ -26,16 +26,12 @@ void feature_matching(const cv::Mat &src1, const cv::Mat &src2, cv::Mat &dst)
   /* 特徴点検出*/
   /* AKAZE */
   cv::Ptr<cv::AKAZE> akaze = cv::AKAZE::create();
-  akaze->detect(src1, key1);
-  akaze->detect(src2, key2);
-  akaze->compute(src1, key1, des1); 
-  akaze->compute(src2, key2, des2);
+  // akaze->detectAndCompute(src1, cv::noArray(), key1, des1);
+  // akaze->detectAndCompute(src2, cv::noArray(), key2, des2);
   /* ORB */
   // cv::Ptr<cv::ORB> orb = cv::ORB::create();
-  // orb->detect(src1, key1);
-  // orb->detect(src2, key2);
-  // orb->compute(src1, key1, des1); 
-  // orb->compute(src2, key2, des2);
+  // orb->detectAndCompute(src1, cv::noArray(), key1, des1);
+  // orb->detectAndCompute(src2, cv::noArray(), key2, des2);
 
   //std::cout << des1 << std::endl;
 
