@@ -2,6 +2,7 @@ build/*
 !.gitkeep
 
 # テスト用のmain関数
-#/src/main.cpp
+/src/main.cpp
 
 #テスト用のcmake
+/CMakeLists.txt
