@@ -19,8 +19,6 @@ void feature_matching(const cv::Mat &src1, const cv::Mat &src2, cv::Mat &dst)
 {
   std::vector<cv::KeyPoint> key1, key2; // 特徴点を格納
   cv::Mat des1, des2; // 特徴量記述の計算
-  const float THRESHOLD = 100; // 類似度の閾値
-  float sim = 0;
 
   /* 比較のために複数手法を記述 必要に応じてコメントアウト*/
   /* 特徴点検出*/
@@ -59,6 +57,22 @@ void feature_matching(const cv::Mat &src1, const cv::Mat &src2, cv::Mat &dst)
     }
   }
 
+  /* 類似度計算(距離による実装、0に近い値ほど画像が類似) */
+  float sim = 0;
+  const float THRESHOLD = 300; // 類似度の閾値(仮)
+  for(int i = 0; i < match.size(); i++){
+    cv::DMatch dis = match[i];
+    sim += dis.distance;
+  }
+  sim /= match.size();
+  std::cout << "類似度: " << sim << std::endl; 
+
+  /* 画像の類似度が低すぎる場合は終了 */
+  if(0/* sim > THRESHOLD*/){
+    std::cerr << "画像が違いすぎます" << std::endl;
+    std::exit(1);
+  }
+
   /* 特徴量距離の小さい順にソートし、不要な点を削除 */
   for(int i = 0; i < match.size(); i++){
     double min = match[i].distance;
@@ -75,20 +89,6 @@ void feature_matching(const cv::Mat &src1, const cv::Mat &src2, cv::Mat &dst)
     match.erase(match.begin() + 50, match.end());
   }else{
     match.erase(match.begin() + match.size(), match.end());
-  }
-
-  /* 類似度計算(距離による実装、0に近い値ほど画像が類似) */
-  for(int i = 0; i < match.size(); i++){
-    cv::DMatch dis = match[i];
-    sim += dis.distance;
-  }
-  sim /= match.size();
-  std::cout << "類似度: " << sim << std::endl; 
-
-  /* 画像の類似度が低すぎる場合は終了 */
-  if(0/* sim > THRESHOLD*/){
-    std::cerr << "画像が違いすぎます" << std::endl;
-    std::exit(1);
   }
 
   //cv::drawMatches(src1, key1, src2, key2, match, dst);
