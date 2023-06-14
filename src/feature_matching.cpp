@@ -2,9 +2,10 @@
 #include <iostream>
 
 /*  特徴点マッチングによる類似度計算及び入力画像の補正(射影変換)を行う関数 
-    src1 : 入力画像(変形される)
-    src2 : 入力画像
-    dst  : 出力画像(src1をsrc2に合わせて変形した画像)
+    src1 : 入力画像1
+    src2 : 入力画像2
+    dst1 : 出力画像1
+    dst2 : 出力画像2
     
     動作確認済
     1. 特徴点検出:ORB   + 特徴点マッチング:総当たり(BMF)
@@ -15,21 +16,30 @@
     必要処理時間: 3 < 1 < 4 < 2 
     精度　　　　: 1 = 3 < 2 = 4    */
 
-void feature_matching(const cv::Mat &src1, const cv::Mat &src2, cv::Mat &dst)
+void feature_matching(const cv::Mat &src1, const cv::Mat &src2, cv::Mat &dst1, cv::Mat &dst2)
 {
   std::vector<cv::KeyPoint> key1, key2; // 特徴点を格納
   cv::Mat des1, des2; // 特徴量記述の計算
+
+  /* 2画像を比較して2辺とも小さい場合はsrc2に合わせて補正できるように */
+  if(src1.cols <= src2.cols && src1.rows <= src2.rows){
+    dst1 = src2;
+    dst2 = src1;
+  }else{
+    dst1 = src1;
+    dst2 = src2;
+  }
 
   /* 比較のために複数手法を記述 必要に応じてコメントアウト*/
   /* 特徴点検出*/
   /* AKAZE */
   cv::Ptr<cv::AKAZE> akaze = cv::AKAZE::create();
-  akaze->detectAndCompute(src1, cv::noArray(), key1, des1);
-  akaze->detectAndCompute(src2, cv::noArray(), key2, des2);
+  akaze->detectAndCompute(dst1, cv::noArray(), key1, des1);
+  akaze->detectAndCompute(dst2, cv::noArray(), key2, des2);
   /* ORB */
   // cv::Ptr<cv::ORB> orb = cv::ORB::create();
-  // orb->detectAndCompute(src1, cv::noArray(), key1, des1);
-  // orb->detectAndCompute(src2, cv::noArray(), key2, des2);
+  // orb->detectAndCompute(dst1, cv::noArray(), key1, des1);
+  // orb->detectAndCompute(dst2, cv::noArray(), key2, des2);
 
   //std::cout << des1 << std::endl;
 
@@ -106,5 +116,5 @@ void feature_matching(const cv::Mat &src1, const cv::Mat &src2, cv::Mat &dst)
   /* ホモグラフィ行列推定 */
   cv::Mat H = cv::findHomography(get_pt1, get_pt2, cv::RANSAC); 
   /* src1を変形 */
-  cv::warpPerspective(src1, dst, H, src2.size());
+  cv::warpPerspective(dst1, dst1, H, dst2.size());
 }
