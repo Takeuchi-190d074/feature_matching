@@ -65,7 +65,6 @@ void feature_matching(const cv::Mat &src1, const cv::Mat &src2, cv::Mat &dst1, c
     if(knn_matches[i][0].distance < RATIO_THRESH * knn_matches[i][1].distance){
       match.push_back(knn_matches[i][0]);
     }
-    std::swap(match[i], match[n]);
   }
 
   /* 類似度計算(距離による実装、0に近い値ほど画像が類似) */
@@ -76,7 +75,7 @@ void feature_matching(const cv::Mat &src1, const cv::Mat &src2, cv::Mat &dst1, c
     sim += dis.distance;
   }
   sim /= match.size();
-  std::cout << "類似度: " << sim << std::endl; 
+  // std::cout << "類似度: " << sim << std::endl; 
 
   /* 画像の類似度が低すぎる場合は終了 */
   if(0/* sim > THRESHOLD*/){
