@@ -14,6 +14,6 @@ endif()
 set(EXECUTABLE "feature_matching")
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS}) #インクルードディレクトリ指定 
-# add_executable(${EXECUTABLE} src/main.cpp src/${EXECUTABLE}.cpp)
-add_executable(${EXECUTABLE} src/sof.cpp src/${EXECUTABLE}.cpp src/absdiff.cpp)
+add_executable(${EXECUTABLE} src/main.cpp src/${EXECUTABLE}.cpp src/cropping.cpp)
+# add_executable(${EXECUTABLE} src/sof.cpp src/${EXECUTABLE}.cpp src/absdiff.cpp src/cropping.cpp)
 target_link_libraries(${EXECUTABLE} ${OpenCV_LIBS})
